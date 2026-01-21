@@ -53,7 +53,7 @@ class DeleteCollectionTreeAction extends Component {
     const { hasCollections } = this.props;
 
     return (
-      <div>
+      <>
         <Modal.Content>
           {error && (
             <Message negative>
@@ -105,7 +105,7 @@ class DeleteCollectionTreeAction extends Component {
             {i18next.t("Cancel")}
           </Button>
         </Modal.Actions>
-      </div>
+      </>
     );
   }
 }

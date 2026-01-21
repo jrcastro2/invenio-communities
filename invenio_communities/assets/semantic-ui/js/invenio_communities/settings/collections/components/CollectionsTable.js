@@ -21,17 +21,16 @@ const CollectionsTable = ({
 }) => {
   const renderCollectionRow = (item, key) => {
     const collection = item[key];
-    const depthColor = `rgba(0, 0, 0, ${0.05 * collection.depth})`; // Calculate background color based on depth
 
     return (
       <React.Fragment key={collection.id}>
         <Table.Row
-          style={{ backgroundColor: collection.depth > 0 ? depthColor : "transparent" }}
+          className={collection.depth > 0 ? "collection-depth-bg" : ""}
+          data-depth={collection.depth}
         >
           <Table.Cell
-            style={{
-              paddingLeft: `${collection.depth === 0 ? 1 : collection.depth}rem`,
-            }}
+            className="collection-depth-padding"
+            data-depth={collection.depth}
           >
             {collection.depth > 0 && "↳"} {collection.title}
           </Table.Cell>

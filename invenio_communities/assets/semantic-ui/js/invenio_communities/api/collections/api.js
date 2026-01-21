@@ -5,6 +5,7 @@
 // under the terms of the MIT License; see LICENSE file for more details.
 
 import { http } from "react-invenio-forms";
+import { CommunityLinksExtractor } from "../CommunityLinksExtractor";
 
 /**
  * API Client for community collection trees.
@@ -13,11 +14,14 @@ import { http } from "react-invenio-forms";
  *
  */
 export class CommunityCollectionsApi {
-  #communityId;
-  baseUrl = "/api/communities/";
+  #urls;
 
-  constructor(community) {
-    this.#communityId = community.id;
+  constructor(community, LinksExtractor = CommunityLinksExtractor) {
+    this.#urls = new LinksExtractor(community);
+  }
+
+  get endpoint() {
+    return this.#urls.collectionTreesUrl;
   }
 
   /**
@@ -37,16 +41,20 @@ export class CommunityCollectionsApi {
   }
 
   /**
-   * Append tree_id to existing URL with query params.
+   * Build URL with query parameters.
    * @private
-   * @param {string} url - Base URL (may include query params)
-   * @param {string|null} treeId - Tree ID
-   * @returns {string} URL with tree_id appended
+   * @param {string} baseUrl - Base URL
+   * @param {Object} params - Query parameters to append
+   * @returns {string} URL with query parameters
    */
-  _appendTreeId(url, treeId) {
-    if (!treeId) return url;
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}tree_id=${encodeURIComponent(treeId)}`;
+  _buildUrl(baseUrl, params = {}) {
+    const url = new URL(baseUrl, window.location.origin);
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        url.searchParams.set(key, value);
+      }
+    });
+    return url.toString();
   }
 
   /**
@@ -60,7 +68,7 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    const url = `${this.baseUrl}${this.#communityId}/collection-trees?depth=${depth}`;
+    const url = this._buildUrl(this.endpoint, { depth });
     return http.get(url, {
       headers: headers,
       ...options,
@@ -84,8 +92,7 @@ export class CommunityCollectionsApi {
       0
     );
     payload.order = maxOrder + 1;
-    const url = `${this.baseUrl}${this.#communityId}/collection-trees`;
-    return http.post(url, payload, {
+    return http.post(this.endpoint, payload, {
       headers: headers,
       ...options,
     });
@@ -105,8 +112,7 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${this.#communityId}/collection-trees/${treeSlug}`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(`${this.endpoint}/${treeSlug}`, { tree_id: treeId });
     return http.put(url, payload, {
       headers: headers,
       ...options,
@@ -127,13 +133,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${this.#communityId}/collection-trees/${treeSlug}`;
-    url = this._appendTreeId(url, treeId);
-    // Append cascade parameter if true
-    const separator = url.includes("?") ? "&" : "?";
-    if (cascade) {
-      url = `${url}${separator}cascade=true`;
-    }
+    const url = this._buildUrl(`${this.endpoint}/${treeSlug}`, {
+      tree_id: treeId,
+      cascade: cascade ? "true" : undefined,
+    });
     return http.delete(url, {
       headers: headers,
       ...options,
@@ -153,10 +156,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}?depth=10`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(`${this.endpoint}/${treeSlug}`, {
+      depth: 10,
+      tree_id: treeId,
+    });
     return http.get(url, {
       headers: headers,
       ...options,
@@ -184,10 +187,9 @@ export class CommunityCollectionsApi {
       0
     );
     payload.order = maxOrder + 1;
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(`${this.endpoint}/${treeSlug}/collections`, {
+      tree_id: treeId,
+    });
     return http.post(url, payload, {
       headers: headers,
       ...options,
@@ -209,10 +211,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections/${collectionSlug}`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections/${collectionSlug}`,
+      { tree_id: treeId }
+    );
     return http.post(url, payload, {
       headers: headers,
       ...options,
@@ -234,10 +236,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections/${collectionSlug}`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections/${collectionSlug}`,
+      { tree_id: treeId }
+    );
     return http.put(url, payload, {
       headers: headers,
       ...options,
@@ -265,15 +267,13 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections/${collectionSlug}`;
-    url = this._appendTreeId(url, treeId);
-    // Append cascade parameter if true
-    const separator = url.includes("?") ? "&" : "?";
-    if (cascade) {
-      url = `${url}${separator}cascade=true`;
-    }
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections/${collectionSlug}`,
+      {
+        tree_id: treeId,
+        cascade: cascade ? "true" : undefined,
+      }
+    );
     return http.delete(url, {
       headers: headers,
       ...options,
@@ -294,10 +294,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections/${collectionSlug}`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections/${collectionSlug}`,
+      { tree_id: treeId }
+    );
     return http.get(url, {
       headers: headers,
       ...options,
@@ -325,10 +325,13 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections-records-test?test_col_slug=${collectionSlug}`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections-records-test`,
+      {
+        test_col_slug: collectionSlug,
+        tree_id: treeId,
+      }
+    );
     return http.post(url, payload, {
       headers: headers,
       ...options,
@@ -354,10 +357,10 @@ export class CommunityCollectionsApi {
     const headers = {
       Accept: "application/json",
     };
-    let url = `${this.baseUrl}${
-      this.#communityId
-    }/collection-trees/${treeSlug}/collections-records-test`;
-    url = this._appendTreeId(url, treeId);
+    const url = this._buildUrl(
+      `${this.endpoint}/${treeSlug}/collections-records-test`,
+      { tree_id: treeId }
+    );
     return http.post(url, payload, {
       headers: headers,
       ...options,
