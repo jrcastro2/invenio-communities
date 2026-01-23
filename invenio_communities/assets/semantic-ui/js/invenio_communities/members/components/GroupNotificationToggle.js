@@ -18,7 +18,7 @@ export class GroupNotificationToggle extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      notificationEnabled: props.initialValue ?? true,
+      notificationEnabled: props.initialValue ?? false,
       actionSuccess: false,
       error: undefined,
     };
@@ -48,7 +48,7 @@ export class GroupNotificationToggle extends Component {
     const { notificationEnabled, actionSuccess, error } = this.state;
 
     return (
-      <div className="display-inline-flex flex-direction-row-reverse">
+      <div className="display-inline-flex flex-direction-row-reverse align-items-center">
         <Checkbox toggle checked={notificationEnabled} onChange={this.handleToggle} />
         <div className="ml-15 action-status-container">
           {actionSuccess && <SuccessIcon timeOutDelay={3000} show={actionSuccess} />}

@@ -11,7 +11,7 @@ import { RadioSelection } from "@js/invenio_communities/members/components/bulk_
 import { ErrorMessage } from "@js/invenio_communities/members/components/ErrorMessage";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Modal, Form, Button, Checkbox } from "semantic-ui-react";
+import { Modal, Form, Button, Checkbox, Popup, Icon } from "semantic-ui-react";
 import { i18next } from "@translations/invenio_communities/i18next";
 import { MembersSearchBar } from "./MemberSearchBar";
 import { GroupsApi } from "../../../api/GroupsApi";
@@ -27,7 +27,7 @@ export class GroupTabPane extends Component {
       loading: false,
       error: undefined,
       existingIds: [],
-      groupNotificationEnabled: true,
+      groupNotificationEnabled: false,
     };
   }
 
@@ -117,19 +117,35 @@ export class GroupTabPane extends Component {
                 existingEntitiesDescription={i18next.t("Already a member")}
               />
             </Form.Field>
+            <Form.Field className="flex align-items-center">
+              <span className="mr-5">{i18next.t("Email notifications")}</span>
+              <Popup
+                trigger={
+                  <span>
+                    <Icon
+                      name="info circle"
+                      className="mr-10 neutral"
+                      style={{ cursor: "help" }}
+                    />
+                  </span>
+                }
+                content={i18next.t(
+                  "When enabled, group members will receive emails related to community actions, such as submission of records."
+                )}
+                wide="very"
+                position="top center"
+              />
+              <Checkbox
+                toggle
+                checked={groupNotificationEnabled}
+                onChange={this.handleNotificationToggle}
+              />
+            </Form.Field>
             <Form.Field required>
               <RadioSelection
                 options={roleOptions}
                 label={i18next.t("Role")}
                 onOptionChangeCallback={this.handleRoleUpdate}
-              />
-            </Form.Field>
-            <Form.Field>
-              <Checkbox
-                toggle
-                checked={groupNotificationEnabled}
-                onChange={this.handleNotificationToggle}
-                label={i18next.t("Enable notifications for group members")}
               />
             </Form.Field>
             <i>

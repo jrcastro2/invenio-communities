@@ -32,7 +32,7 @@ export class CommunityInvitationsApi {
     members,
     role,
     message = undefined,
-    groupNotificationEnabled = true
+    groupNotificationEnabled = false
   ) => {
     const payload = {
       members: bulkMembersSerializer(members),
