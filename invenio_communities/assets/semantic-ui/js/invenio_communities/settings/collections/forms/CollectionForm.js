@@ -120,10 +120,7 @@ const CollectionForm = ({
                 />
                 <Divider hidden />
                 <div className="flex justify-space-between">
-                  <Button
-                    type="button"
-                    onClick={handleCancel}
-                  >
+                  <Button type="button" onClick={handleCancel}>
                     {i18next.t("Cancel")}
                   </Button>
                   <div>
@@ -170,7 +167,11 @@ const CollectionForm = ({
                 <div className="rel-mt-1">
                   <Button
                     as="a"
-                    href={`/communities/${community.slug}/records?q=${encodeURIComponent(buildFullSearchQuery(formik.values.search_query))}`}
+                    href={`/communities/${
+                      community.slug
+                    }/records?q=${encodeURIComponent(
+                      buildFullSearchQuery(formik.values.search_query)
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     icon="external"

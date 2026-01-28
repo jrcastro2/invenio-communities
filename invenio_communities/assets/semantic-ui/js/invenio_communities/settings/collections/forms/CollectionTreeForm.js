@@ -73,19 +73,12 @@ const CollectionTreeForm = ({
                   fluid
                   fieldPath="slug"
                   label={
-                    <FieldLabel
-                      htmlFor="slug"
-                      icon="group"
-                      label={i18next.t("Slug")}
-                    />
+                    <FieldLabel htmlFor="slug" icon="group" label={i18next.t("Slug")} />
                   }
                 />
                 <Divider hidden />
                 <div className="flex justify-space-between">
-                  <Button
-                    type="button"
-                    onClick={handleCancel}
-                  >
+                  <Button type="button" onClick={handleCancel}>
                     {i18next.t("Cancel")}
                   </Button>
                   <Button

@@ -6,7 +6,15 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Grid, Header, Button, Icon, Divider, Container, Message } from "semantic-ui-react";
+import {
+  Grid,
+  Header,
+  Button,
+  Icon,
+  Divider,
+  Container,
+  Message,
+} from "semantic-ui-react";
 import { i18next } from "@translations/invenio_communities/i18next";
 import { CollectionsContext } from "../../../api/collections/CollectionsContextProvider";
 import CollectionBrowseCard from "./CollectionBrowseCard";
@@ -67,7 +75,7 @@ class CollectionTreeBrowseView extends Component {
 
       // Recursively process all children
       if (collection.children && collection.children.length > 0) {
-        collection.children.forEach(childSlug => {
+        collection.children.forEach((childSlug) => {
           processCollectionAndDescendants(childSlug, collectionData);
         });
       }
@@ -177,8 +185,8 @@ class CollectionTreeBrowseView extends Component {
         const orderPayload = {
           order: items.map((collection, index) => ({
             slug: collection.slug,
-            order: (index + 1) * 10  // Use gaps (10, 20, 30...)
-          }))
+            order: (index + 1) * 10, // Use gaps (10, 20, 30...)
+          })),
         };
 
         await this.context.api.batch_reorder_collections(
@@ -203,7 +211,8 @@ class CollectionTreeBrowseView extends Component {
       showHeader = false,
       maxCollectionDepth,
     } = this.props;
-    const { collectionMap, rootCollections, draggedIndex, draggedOverIndex } = this.state;
+    const { collectionMap, rootCollections, draggedIndex, draggedOverIndex } =
+      this.state;
 
     if (!collectionTree) {
       return null;
@@ -220,7 +229,12 @@ class CollectionTreeBrowseView extends Component {
                 </Header>
               </Grid.Column>
               <Grid.Column width={6} textAlign="right">
-                <Button positive onClick={() => onAddCollection(collectionTree.id, collectionTree.slug)}>
+                <Button
+                  positive
+                  onClick={() =>
+                    onAddCollection(collectionTree.id, collectionTree.slug)
+                  }
+                >
                   <Icon name="plus" /> {i18next.t("New collection")}
                 </Button>
                 <Button onClick={() => onEditTree(collectionTree)}>
@@ -254,13 +268,16 @@ class CollectionTreeBrowseView extends Component {
           <Grid relaxed stackable>
             {rootCollections.map((collection, index) => {
               const isCollectionDragging = draggedIndex === index;
-              const isCollectionDraggedOver = draggedOverIndex === index && draggedIndex !== index;
+              const isCollectionDraggedOver =
+                draggedOverIndex === index && draggedIndex !== index;
 
               return (
                 <Grid.Column
                   width={4}
                   key={collection.slug}
-                  className={`collection-grid-column collection-card ${isCollectionDragging ? 'dragging' : ''} ${isCollectionDraggedOver ? 'drag-over' : ''}`}
+                  className={`collection-grid-column collection-card ${
+                    isCollectionDragging ? "dragging" : ""
+                  } ${isCollectionDraggedOver ? "drag-over" : ""}`}
                   onDragOver={(e) => this.handleDragOver(e, index)}
                 >
                   <CollectionBrowseCard
@@ -272,7 +289,7 @@ class CollectionTreeBrowseView extends Component {
                     community={community}
                     collectionApi={this.context.api}
                     treeSlug={collectionTree.slug}
-                    isDraggable={true}
+                    isDraggable
                     dragIndex={index}
                     onDragStart={this.handleDragStart}
                     onDragEnd={this.handleDragEnd}

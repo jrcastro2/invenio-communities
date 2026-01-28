@@ -94,9 +94,7 @@ class DeleteCollectionTreeAction extends Component {
         </Modal.Content>
         <Modal.Actions>
           <div className="flex justify-space-between">
-            <Button onClick={this.props.handleCancel}>
-              {i18next.t("Cancel")}
-            </Button>
+            <Button onClick={this.props.handleCancel}>{i18next.t("Cancel")}</Button>
             <Button
               negative
               onClick={this.handleDelete}

@@ -102,15 +102,12 @@ const CollectionBrowseCard = ({
             const child = allCollections[childId];
             return {
               slug: child.slug,
-              order: (index + 1) * 10
+              order: (index + 1) * 10,
             };
-          })
+          }),
         };
 
-        await collectionApi.batch_reorder_collections(
-          treeSlug,
-          orderPayload
-        );
+        await collectionApi.batch_reorder_collections(treeSlug, orderPayload);
       } catch (error) {
         console.error("Failed to update child collection order:", error);
         // Revert on error
@@ -155,7 +152,7 @@ const CollectionBrowseCard = ({
               {isDraggable && onDragStart && (
                 <Icon
                   name="bars"
-                  className={`parent-drag-handle ${isDragging ? 'grabbing' : ''}`}
+                  className={`parent-drag-handle ${isDragging ? "grabbing" : ""}`}
                   draggable
                   onDragStart={(e) => onDragStart(e, dragIndex)}
                   onDragEnd={onDragEnd}
@@ -211,7 +208,12 @@ const CollectionBrowseCard = ({
             const child = allCollections[childSlug];
             if (!child) return null;
 
-            const { title, num_records, depth, children: childChildren } = child;
+            const {
+              title,
+              num_records: numRecords,
+              depth,
+              children: childChildren,
+            } = child;
 
             const childActionMenuOptions = [
               {
@@ -240,18 +242,23 @@ const CollectionBrowseCard = ({
               : null;
 
             const isChildDragging = draggedChildIndex === index;
-            const isChildDraggedOver = draggedOverChildIndex === index && draggedChildIndex !== index;
+            const isChildDraggedOver =
+              draggedOverChildIndex === index && draggedChildIndex !== index;
 
             return (
               <div key={childSlug}>
                 <Container
-                  className={`mb-0 mt-0 collection-child-item ${isChildDragging ? 'dragging' : ''} ${isChildDraggedOver ? 'drag-over' : ''}`}
+                  className={`mb-0 mt-0 collection-child-item ${
+                    isChildDragging ? "dragging" : ""
+                  } ${isChildDraggedOver ? "drag-over" : ""}`}
                   onDragOver={(e) => handleChildDragOver(e, index)}
                 >
                   <div className="child-collection-row">
                     <Icon
                       name="bars"
-                      className={`child-drag-handle ${isChildDragging ? 'grabbing' : ''}`}
+                      className={`child-drag-handle ${
+                        isChildDragging ? "grabbing" : ""
+                      }`}
                       draggable
                       onDragStart={(e) => handleChildDragStart(e, index)}
                       onDragEnd={handleChildDragEnd}
@@ -278,8 +285,11 @@ const CollectionBrowseCard = ({
                           {title}
                         </Header>
                       )}
-                      <Label size="tiny" className="child-collection-label text-muted ml-1">
-                        ({num_records || 0})
+                      <Label
+                        size="tiny"
+                        className="child-collection-label text-muted ml-1"
+                      >
+                        ({numRecords || 0})
                       </Label>
                     </div>
                     <Dropdown
@@ -359,6 +369,17 @@ CollectionBrowseCard.propTypes = {
   maxCollectionDepth: PropTypes.number.isRequired,
 };
 
+CollectionBrowseCard.defaultProps = {
+  community: null,
+  collectionApi: null,
+  treeSlug: null,
+  isDraggable: false,
+  dragIndex: null,
+  onDragStart: null,
+  onDragEnd: null,
+  isDragging: false,
+};
+
 /**
  * Recursive component for rendering nested child collections.
  * Displays collection information with edit/delete/add actions and
@@ -387,7 +408,7 @@ const NestedCollectionItem = ({
   community,
   treeSlug,
 }) => {
-  const { title, num_records, depth, children, slug } = collection;
+  const { title, num_records: numRecords, depth, children, slug } = collection;
 
   const [childrenOrder, setChildrenOrder] = useState([]);
 
@@ -424,10 +445,7 @@ const NestedCollectionItem = ({
     : null;
 
   return (
-    <div
-      className="nested-collection-item"
-      data-nesting-level={nestingLevel}
-    >
+    <div className="nested-collection-item" data-nesting-level={nestingLevel}>
       <Container className="mb-0 mt-0 collection-child-item">
         <div className="child-collection-row">
           <div className="child-collection-content">
@@ -444,16 +462,12 @@ const NestedCollectionItem = ({
                 </Header>
               </a>
             ) : (
-              <Header
-                as="h5"
-                className="theme-primary-text truncated"
-                title={title}
-              >
+              <Header as="h5" className="theme-primary-text truncated" title={title}>
                 {title}
               </Header>
             )}
             <Label size="tiny" className="child-collection-label text-muted ml-1">
-              ({num_records || 0})
+              ({numRecords || 0})
             </Label>
           </div>
           <Dropdown

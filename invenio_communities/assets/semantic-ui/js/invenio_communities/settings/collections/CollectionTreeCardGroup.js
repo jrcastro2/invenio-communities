@@ -243,7 +243,7 @@ class CollectionTreeCardGroup extends Component {
     trees.forEach((tree, index) => {
       const updatedTree = {
         ...tree,
-        order: (index + 1) * 10
+        order: (index + 1) * 10,
       };
       reorderedData[tree.slug] = updatedTree;
     });
@@ -255,8 +255,8 @@ class CollectionTreeCardGroup extends Component {
       const orderPayload = {
         order: trees.map((tree, index) => ({
           slug: tree.slug,
-          order: (index + 1) * 10
-        }))
+          order: (index + 1) * 10,
+        })),
       };
 
       await this.context.api.batch_reorder_trees(orderPayload);
@@ -270,7 +270,6 @@ class CollectionTreeCardGroup extends Component {
   openCollectionFormModal = (treeId, treeSlug) => {
     this.setState({
       showCollectionFormModal: true,
-      selectedTreeId: treeId,
       selectedTreeSlug: treeSlug,
     });
   };
@@ -403,19 +402,24 @@ class CollectionTreeCardGroup extends Component {
     const { community } = this.props;
 
     // Convert to array and sort by order field to respect backend ordering
-    const sortedTrees = Object.values(data).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const sortedTrees = Object.values(data).sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
 
     return sortedTrees.map((collectionTree, index) => {
       const isExpanded = expandedTrees[collectionTree.id] || false;
       const collections = collectionTree.collections || [];
 
       const isDraggingThis = draggedTreeIndex === index;
-      const isDraggedOver = draggedOverTreeIndex === index && draggedTreeIndex !== index;
+      const isDraggedOver =
+        draggedOverTreeIndex === index && draggedTreeIndex !== index;
 
       return (
         <div
           key={collectionTree.id}
-          className={`collection-tree-section rel-mb-2 ${isDraggingThis ? 'dragging' : ''} ${isDraggedOver ? 'drag-over' : ''}`}
+          className={`collection-tree-section rel-mb-2 ${
+            isDraggingThis ? "dragging" : ""
+          } ${isDraggedOver ? "drag-over" : ""}`}
           onDragOver={(e) => this.handleTreeDragOver(e, index)}
         >
           <Grid verticalAlign="middle" className="rel-mb-1">
@@ -423,7 +427,7 @@ class CollectionTreeCardGroup extends Component {
               <div className="category-controls">
                 <Icon
                   name="bars"
-                  className={`tree-drag-handle ${isDraggingThis ? 'grabbing' : ''}`}
+                  className={`tree-drag-handle ${isDraggingThis ? "grabbing" : ""}`}
                   draggable
                   onDragStart={(e) => this.handleTreeDragStart(e, index)}
                   onDragEnd={this.handleTreeDragEnd}
@@ -444,14 +448,13 @@ class CollectionTreeCardGroup extends Component {
               <Button
                 positive
                 size="small"
-                onClick={() => this.openCollectionFormModal(collectionTree.id, collectionTree.slug)}
+                onClick={() =>
+                  this.openCollectionFormModal(collectionTree.id, collectionTree.slug)
+                }
               >
                 <Icon name="plus" /> {i18next.t("New collection")}
               </Button>
-              <Button
-                size="small"
-                onClick={() => this.openEditModal(collectionTree)}
-              >
+              <Button size="small" onClick={() => this.openEditModal(collectionTree)}>
                 <Icon name="edit" /> {i18next.t("Edit Category")}
               </Button>
               <Button
@@ -487,13 +490,8 @@ class CollectionTreeCardGroup extends Component {
   }
 
   render() {
-    const {
-      isLoading,
-      error,
-      data,
-      showCollectionFormModal,
-      selectedTreeSlug,
-    } = this.state;
+    const { isLoading, error, data, showCollectionFormModal, selectedTreeSlug } =
+      this.state;
     const { emptyMessage, community } = this.props;
 
     return (
@@ -503,7 +501,9 @@ class CollectionTreeCardGroup extends Component {
             <Grid.Column width={12}>
               <h2>{i18next.t("Categories")}</h2>
               <p className="text-muted">
-                {i18next.t("A container of collections with a visible title. Needed to group collections together.")}
+                {i18next.t(
+                  "A container of collections with a visible title. Needed to group collections together."
+                )}
               </p>
             </Grid.Column>
             <Grid.Column width={4} textAlign="right">
@@ -665,7 +665,6 @@ class CollectionTreeCardGroup extends Component {
 
 CollectionTreeCardGroup.propTypes = {
   community: PropTypes.object.isRequired,
-  permissions: PropTypes.object.isRequired,
   maxCollectionDepth: PropTypes.number.isRequired,
   emptyMessage: PropTypes.string.isRequired,
 };
