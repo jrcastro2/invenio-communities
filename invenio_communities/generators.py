@@ -428,30 +428,49 @@ class AllowedMemberTypes(Generator):
         return []
 
 
-class IfCollectionsEnabled(IfRestrictedBase):
-    """Conditional generator based on collections_enabled field.
+class IfCommunitySlug(Generator):
+    """Conditional generator based on community slug.
 
-    When collections are disabled (False), restricts access to system process only.
-    When collections are enabled (True), allows normal permissions.
+    Allows applying different permissions for specific communities identified by slug.
+    Useful for blocking or allowing collections management for specific communities.
+
+    Example:
+        # Block collections for 'phys' community
+        IfCommunitySlug(
+            slugs=['phys'],
+            then_=[Disable()],  # Blocks everyone
+            else_=[CommunityOwners(), CommunityManagers()]  # Normal permissions
+        )
     """
 
-    def __init__(self, then_, else_):
+    def __init__(self, slugs, then_, else_):
         """Initialize.
 
         Args:
-            then_: Generators to use when collections are enabled (True).
-            else_: Generators to use when collections are disabled (False).
+            slugs (list): List of community slugs to match against.
+            then_: Generators to use when community slug matches.
+            else_: Generators to use when community slug doesn't match.
         """
-        field = "collections_enabled"
-        super().__init__(
-            field_getter=lambda r: (
-                getattr(r.access, field, None)
-                if hasattr(r, "access")
-                else r.get("access", {}).get(field)
-            ),
-            field_name=f"access.{field}",
-            then_value=True,  # Collections enabled
-            else_value=False,  # Collections disabled
-            then_=then_,
-            else_=else_,
-        )
+        self.slugs = slugs if isinstance(slugs, list) else [slugs]
+        self.then_ = then_
+        self.else_ = else_
+
+    def generators(self, record):
+        """Get the "then" or "else" generators based on community slug."""
+        if record is None:
+            return self.else_
+
+        # Get slug from record - handle both record objects and dicts
+        slug = getattr(record, 'slug', None) or record.get('slug')
+
+        return self.then_ if slug in self.slugs else self.else_
+
+    def needs(self, record=None, **kwargs):
+        """Set of Needs granting permission."""
+        needs = [g.needs(record=record, **kwargs) for g in self.generators(record)]
+        return set(chain.from_iterable(needs))
+
+    def excludes(self, record=None, **kwargs):
+        """Set of Needs denying permission."""
+        needs = [g.excludes(record=record, **kwargs) for g in self.generators(record)]
+        return set(chain.from_iterable(needs))
